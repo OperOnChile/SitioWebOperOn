@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OperOn — Digitaliza y controla tu operación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg:#F8FAFC; --bg2:#F1F5F9; --navy:#0B1B3E; --cyan:#00A9B3; --cyan-dk:#007E87;
+  --cyan-lt:#E0F7F9; --white:#FFFFFF; --g1:#475569; --g2:#94A3B8; --g3:#CBD5E1;
+  --g4:#E2E8F0; --green:#10B981; --orange:#F59E0B; --red:#EF4444;
+  --purple:#7C3AED;
+}
+html{scroll-behavior:smooth;}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--navy);overflow-x:hidden;-webkit-font-smoothing:antialiased;}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;height:62px;display:flex;align-items:center;padding:0 48px;background:rgba(248,250,252,.9);backdrop-filter:blur(18px);border-bottom:1px solid var(--g4);}
+.nav-inner{width:100%;max-width:1400px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;gap:8px;text-decoration:none;}
+.nav-logo-text{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:19px;color:var(--navy);letter-spacing:-.4px;}
+.nav-logo-text em{color:var(--cyan);font-style:normal;}
+.nav-links{display:flex;gap:30px;list-style:none;}
+.nav-links a{font-size:13.5px;font-weight:500;color:var(--g1);text-decoration:none;transition:color .15s;position:relative;}
+.nav-links a.act{color:var(--cyan);}
+.nav-links a.act::after{content:'';position:absolute;bottom:-22px;left:0;right:0;height:2px;background:var(--cyan);border-radius:1px;}
+.nav-links a:hover{color:var(--navy);}
+.nav-cta{display:flex;gap:8px;}
+.nb-ghost{padding:7px 18px;border:1.5px solid var(--g3);border-radius:8px;font-size:13px;font-weight:500;color:var(--navy);text-decoration:none;background:transparent;transition:all .15s;}
+.nb-ghost:hover{border-color:var(--cyan);color:var(--cyan);}
+.nb-filled{padding:7px 18px;background:var(--cyan);border:none;border-radius:8px;font-size:13px;font-weight:600;color:#fff;text-decoration:none;transition:all .15s;box-shadow:0 1px 3px rgba(0,169,179,.22),0 3px 10px rgba(0,169,179,.18);}
+.nb-filled:hover{background:var(--cyan-dk);transform:translateY(-1px);}
+
+/* ── HERO ── */
+.hero{position:relative;min-height:100vh;display:flex;flex-direction:column;justify-content:center;padding:96px 48px 64px;overflow:hidden;}
+.hero::before{content:'';position:absolute;top:-15%;right:-5%;width:600px;height:600px;background:radial-gradient(ellipse,rgba(0,169,179,.1) 0%,transparent 65%);pointer-events:none;}
+.hero::after{content:'';position:absolute;bottom:-5%;left:-4%;width:350px;height:350px;background:radial-gradient(ellipse,rgba(11,27,62,.05) 0%,transparent 65%);pointer-events:none;}
+.dotgrid{position:absolute;inset:0;background-image:radial-gradient(circle,rgba(0,169,179,.09) 1px,transparent 1px);background-size:30px 30px;pointer-events:none;mask-image:radial-gradient(ellipse 75% 75% at 50% 40%,black 0%,transparent 100%);-webkit-mask-image:radial-gradient(ellipse 75% 75% at 50% 40%,black 0%,transparent 100%);}
+#pcanvas{position:absolute;inset:0;pointer-events:none;z-index:1;}
+
+.hero-inner{position:relative;z-index:10;max-width:1400px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1.15fr;gap:60px;align-items:center;}
+
+/* ── LEFT ── */
+.hero-left{display:flex;flex-direction:column;gap:22px;}
+.badge{display:inline-flex;align-items:center;gap:7px;width:fit-content;background:rgba(0,169,179,.09);border:1px solid rgba(0,169,179,.22);padding:5px 13px 5px 8px;border-radius:100px;font-size:11.5px;font-weight:600;color:var(--cyan-dk);letter-spacing:.8px;text-transform:uppercase;}
+.badge-dot{width:6px;height:6px;background:var(--cyan);border-radius:50%;animation:bdot 2s ease-in-out infinite;}
+@keyframes bdot{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.7)}}
+.hero-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:clamp(30px,3.2vw,46px);line-height:1.13;letter-spacing:-1.2px;color:var(--navy);}
+.hero-title .accent{color:var(--cyan);}
+.hero-sub{font-size:15px;line-height:1.72;color:var(--g1);font-weight:400;max-width:400px;}
+.hero-sub strong{color:var(--navy);font-weight:600;}
+.hero-actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:2px;}
+.cta-a{display:inline-flex;align-items:center;gap:7px;padding:12px 24px;background:var(--cyan);border:none;border-radius:9px;font-family:'Inter',sans-serif;font-size:14px;font-weight:600;color:#fff;text-decoration:none;cursor:pointer;transition:all .18s;box-shadow:0 1px 2px rgba(0,169,179,.18),0 4px 14px rgba(0,169,179,.22);}
+.cta-a:hover{background:var(--cyan-dk);transform:translateY(-1px);box-shadow:0 6px 22px rgba(0,169,179,.32);}
+.cta-b{display:inline-flex;align-items:center;gap:7px;padding:12px 24px;background:var(--white);border:1.5px solid var(--g4);border-radius:9px;font-family:'Inter',sans-serif;font-size:14px;font-weight:500;color:var(--navy);text-decoration:none;cursor:pointer;transition:all .18s;box-shadow:0 1px 4px rgba(0,0,0,.05);}
+.cta-b:hover{border-color:var(--g3);box-shadow:0 4px 14px rgba(0,0,0,.08);}
+.metrics{display:flex;gap:24px;align-items:center;padding-top:6px;border-top:1px solid var(--g4);}
+.met{display:flex;flex-direction:column;gap:1px;}
+.met-val{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:22px;color:var(--navy);letter-spacing:-.5px;}
+.met-val em{color:var(--cyan);font-style:normal;font-size:13px;font-weight:600;margin-left:1px;}
+.met-lbl{font-size:11px;color:var(--g2);font-weight:500;}
+.met-sep{width:1px;background:var(--g4);align-self:stretch;}
+
+/* ══════════════════════════════════
+   PLATFORM WIDGET
+══════════════════════════════════ */
+.widget-wrap{
+  position:relative;
+  border-radius:18px;
+  overflow:hidden;
+  box-shadow:0 0 0 1px rgba(11,27,62,.06),0 8px 16px rgba(11,27,62,.06),0 32px 72px rgba(11,27,62,.14);
+  transform:perspective(1100px) rotateY(-4deg) rotateX(2deg);
+  transform-style:preserve-3d;
+  transition:transform .5s cubic-bezier(.23,1,.32,1);
+  background:var(--white);
+  will-change:transform;
+  /* scale down slightly so it fits */
+  max-height: 520px;
+}
+.widget-wrap:hover{transform:perspective(1100px) rotateY(-1deg) rotateX(.5deg);}
+
+/* App shell top bar */
+.app-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;background:var(--white);
+  border-bottom:1px solid var(--g4);
+  flex-shrink:0;
+}
+.app-bar-left{display:flex;align-items:center;gap:10px;}
+.app-logo-sm{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:13px;color:var(--navy);}
+.app-logo-sm em{color:var(--cyan);font-style:normal;}
+.app-ham{display:flex;flex-direction:column;gap:3px;cursor:pointer;padding:3px;}
+.app-ham span{display:block;width:14px;height:1.5px;background:var(--g2);border-radius:2px;}
+.app-bar-right{display:flex;align-items:center;gap:8px;}
+.app-refresh{font-size:10px;color:var(--g2);}
+.app-btn-sm{padding:4px 10px;background:var(--cyan);color:#fff;border:none;border-radius:5px;font-size:10.5px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;}
+
+/* Layout: sidebar + content */
+.app-body{display:flex;height:460px;overflow:hidden;}
+
+/* Sidebar */
+.sidebar{
+  width:130px;flex-shrink:0;
+  border-right:1px solid var(--g4);
+  background:var(--white);
+  padding:10px 0;
+  display:flex;flex-direction:column;
+  overflow:hidden;
+}
+.sb-section{font-size:8.5px;font-weight:600;color:var(--g3);letter-spacing:.8px;text-transform:uppercase;padding:8px 12px 4px;}
+.sb-item{display:flex;align-items:center;gap:7px;padding:6px 12px;cursor:pointer;transition:all .12s;border-radius:0;font-size:11px;font-weight:500;color:var(--g1);}
+.sb-item:hover{background:var(--bg2);color:var(--navy);}
+.sb-item.active{background:var(--cyan-lt);color:var(--cyan-dk);font-weight:600;}
+.sb-item svg{flex-shrink:0;opacity:.7;}
+.sb-item.active svg{opacity:1;}
+.sb-avatar{display:flex;align-items:center;gap:6px;padding:8px 12px;margin-top:auto;border-top:1px solid var(--g4);}
+.sb-av-circle{width:22px;height:22px;border-radius:50%;background:var(--cyan);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff;flex-shrink:0;}
+.sb-av-txt{font-size:10px;font-weight:600;color:var(--navy);}
+.sb-av-role{font-size:9px;color:var(--g2);}
+
+/* Main content area */
+.app-content{flex:1;overflow:hidden;display:flex;flex-direction:column;background:var(--bg);}
+
+/* Tab system */
+.tab-bar{display:flex;background:var(--white);border-bottom:1px solid var(--g4);padding:0 16px;gap:2px;flex-shrink:0;}
+.tab-btn{padding:9px 14px;font-size:11px;font-weight:600;color:var(--g2);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;font-family:'Inter',sans-serif;white-space:nowrap;}
+.tab-btn:hover{color:var(--navy);}
+.tab-btn.active{color:var(--cyan);border-bottom-color:var(--cyan);}
+
+/* Tab panels */
+.tab-panel{display:none;flex:1;overflow:auto;padding:12px 14px;flex-direction:column;gap:10px;}
+.tab-panel.active{display:flex;}
+
+/* ── VIEW: TAREAS ── */
+.view-header{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.view-title{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;color:var(--navy);}
+.view-sub{font-size:10px;color:var(--g2);margin-top:1px;}
+.filter-row{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0;}
+.filter-chip{padding:3px 9px;border:1px solid var(--g4);border-radius:5px;font-size:10px;font-weight:500;color:var(--g1);background:var(--white);cursor:pointer;transition:all .12s;}
+.filter-chip:hover{border-color:var(--cyan);color:var(--cyan);}
+.filter-chip.on{background:var(--cyan-lt);border-color:var(--cyan);color:var(--cyan-dk);}
+
+/* Kanban columns */
+.kanban{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;flex:1;min-height:0;}
+.k-col{display:flex;flex-direction:column;gap:6px;min-height:0;}
+.k-col-header{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.k-col-title{font-size:10px;font-weight:700;display:flex;align-items:center;gap:5px;}
+.k-badge{font-size:9px;font-weight:600;padding:1px 6px;border-radius:100px;}
+.col-vencidas .k-col-title{color:var(--red);}
+.col-vencidas .k-badge{background:#FEE2E2;color:var(--red);}
+.col-hoy .k-col-title{color:var(--orange);}
+.col-hoy .k-badge{background:#FEF3C7;color:var(--orange);}
+.col-proximas .k-col-title{color:var(--cyan);}
+.col-proximas .k-badge{background:var(--cyan-lt);color:var(--cyan-dk);}
+.col-finalizadas .k-col-title{color:var(--green);}
+.col-finalizadas .k-badge{background:#D1FAE5;color:#065F46;}
+.k-cards{display:flex;flex-direction:column;gap:5px;overflow-y:auto;flex:1;}
+.k-cards::-webkit-scrollbar{width:2px;}
+.k-cards::-webkit-scrollbar-thumb{background:var(--g3);border-radius:2px;}
+.k-card{background:var(--white);border:1px solid var(--g4);border-radius:7px;padding:8px 9px;cursor:pointer;transition:all .12s;flex-shrink:0;}
+.k-card:hover{border-color:rgba(0,169,179,.3);box-shadow:0 2px 8px rgba(0,169,179,.08);transform:translateY(-1px);}
+.k-card-id{font-size:8.5px;color:var(--g2);margin-bottom:3px;}
+.k-card-title{font-size:10.5px;font-weight:600;color:var(--navy);line-height:1.35;margin-bottom:4px;}
+.k-card-name{font-size:9.5px;color:var(--g1);}
+.k-card-tags{display:flex;gap:3px;margin-top:5px;flex-wrap:wrap;}
+.k-tag{font-size:8.5px;padding:1px 6px;border-radius:3px;font-weight:500;}
+.tag-pend{background:#FEF3C7;color:#92400E;}
+.tag-noej{background:#F1F5F9;color:var(--g1);}
+.tag-venc{background:#FEE2E2;color:var(--red);}
+.tag-prog{background:var(--cyan-lt);color:var(--cyan-dk);}
+.tag-fin{background:#D1FAE5;color:#065F46;}
+.k-ver-link{font-size:9px;color:var(--cyan);font-weight:600;margin-top:4px;cursor:pointer;display:block;}
+
+/* ── VIEW: KPIs / DASHBOARD ── */
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;flex-shrink:0;}
+.dash-kpi{background:var(--white);border:1px solid var(--g4);border-radius:9px;padding:10px 12px;}
+.dk-label{font-size:9.5px;color:var(--g2);font-weight:500;text-transform:uppercase;letter-spacing:.4px;}
+.dk-val{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:20px;color:var(--navy);margin-top:2px;letter-spacing:-.5px;}
+.dk-val.cy{color:var(--cyan);}
+.dk-val.gr{color:var(--green);}
+.dk-val.or{color:var(--orange);}
+.dk-trend{font-size:9.5px;color:var(--green);font-weight:600;margin-top:2px;display:flex;align-items:center;gap:3px;}
+.dk-trend.down{color:var(--red);}
+.dk-trend.neu{color:var(--g2);}
+
+/* chart */
+.dash-chart{background:var(--white);border:1px solid var(--g4);border-radius:9px;padding:12px;flex-shrink:0;}
+.dc-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.dc-title{font-size:11px;font-weight:600;color:var(--navy);}
+.dc-range{font-size:9.5px;color:var(--g2);}
+.bar-chart{display:flex;align-items:flex-end;gap:5px;height:60px;}
+.bc-bar{flex:1;border-radius:3px 3px 0 0;position:relative;transition:opacity .15s;cursor:pointer;}
+.bc-bar:hover{opacity:.75;}
+.bc-label{font-size:8px;color:var(--g2);text-align:center;margin-top:3px;}
+.bc-group{display:flex;flex-direction:column;align-items:center;flex:1;}
+
+.dash-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px;flex:1;min-height:0;}
+.dash-list{background:var(--white);border:1px solid var(--g4);border-radius:9px;padding:10px;overflow:auto;}
+.dl-title{font-size:10.5px;font-weight:700;color:var(--navy);margin-bottom:7px;}
+.dl-item{display:flex;align-items:center;gap:7px;padding:5px 0;border-bottom:1px solid var(--g4);font-size:10px;}
+.dl-item:last-child{border-bottom:none;}
+.dl-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+.dl-name{flex:1;color:var(--navy);font-weight:500;}
+.dl-val{font-weight:600;color:var(--g1);}
+
+/* ── VIEW: PACIENTES ── */
+.pac-header{display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.pac-search{flex:1;max-width:180px;padding:5px 10px;border:1px solid var(--g4);border-radius:6px;font-size:10.5px;color:var(--navy);outline:none;font-family:'Inter',sans-serif;background:var(--white);}
+.pac-search:focus{border-color:var(--cyan);}
+.pac-filters{display:flex;gap:5px;}
+
+.pac-table{background:var(--white);border:1px solid var(--g4);border-radius:9px;overflow:hidden;flex:1;min-height:0;display:flex;flex-direction:column;}
+.pt-head{display:grid;grid-template-columns:1fr .7fr .8fr .8fr .6fr;gap:0;background:var(--bg2);border-bottom:1px solid var(--g4);padding:6px 10px;flex-shrink:0;}
+.pt-th{font-size:9px;font-weight:700;color:var(--g2);text-transform:uppercase;letter-spacing:.5px;}
+.pt-body{overflow-y:auto;flex:1;}
+.pt-body::-webkit-scrollbar{width:2px;}
+.pt-body::-webkit-scrollbar-thumb{background:var(--g3);}
+.pt-row{display:grid;grid-template-columns:1fr .7fr .8fr .8fr .6fr;gap:0;padding:7px 10px;border-bottom:1px solid var(--g4);align-items:center;cursor:pointer;transition:background .1s;}
+.pt-row:hover{background:var(--bg2);}
+.pt-row:last-child{border-bottom:none;}
+.pt-cell{font-size:10.5px;color:var(--navy);}
+.pt-name{font-weight:600;}
+.pt-sub{font-size:9px;color:var(--g2);margin-top:1px;}
+.pt-status{display:inline-flex;align-items:center;gap:4px;padding:2px 7px;border-radius:100px;font-size:9px;font-weight:600;}
+.ps-alta{background:#D1FAE5;color:#065F46;}
+.ps-seguim{background:var(--cyan-lt);color:var(--cyan-dk);}
+.ps-critico{background:#FEE2E2;color:var(--red);}
+.ps-espera{background:#FEF3C7;color:#92400E;}
+.pt-prog-bar{width:100%;height:5px;background:var(--g4);border-radius:3px;overflow:hidden;}
+.pt-prog-fill{height:100%;border-radius:3px;background:var(--cyan);}
+
+/* scrollbar global */
+.tab-panel::-webkit-scrollbar{width:3px;}
+.tab-panel::-webkit-scrollbar-thumb{background:var(--g3);border-radius:3px;}
+
+/* scroll hint */
+.scroll-hint{position:absolute;bottom:26px;left:50%;transform:translateX(-50%);z-index:20;display:flex;flex-direction:column;align-items:center;gap:5px;opacity:.4;}
+.sh-lbl{font-size:9.5px;color:var(--g2);letter-spacing:1.5px;text-transform:uppercase;}
+.sh-m{width:18px;height:28px;border:1.5px solid var(--g3);border-radius:9px;display:flex;justify-content:center;padding-top:4px;}
+.sh-w{width:2px;height:5px;background:var(--cyan);border-radius:2px;animation:sw 2s ease-in-out infinite;}
+@keyframes sw{0%{transform:translateY(0);opacity:1}70%{transform:translateY(8px);opacity:0}100%{transform:translateY(0);opacity:0}}
+
+/* float cards */
+.fc{position:absolute;background:var(--white);border:1px solid var(--g4);border-radius:12px;padding:9px 13px;box-shadow:0 8px 28px rgba(11,27,62,.11),0 2px 6px rgba(11,27,62,.06);display:flex;align-items:center;gap:9px;white-space:nowrap;z-index:20;}
+.fc-1{top:-22px;right:-20px;animation:fly1 4s ease-in-out infinite;}
+@keyframes fly1{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+.fc-ico{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.fci-g{background:#D1FAE5;}
+.fc-v{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:11.5px;color:var(--navy);}
+.fc-l{font-size:9.5px;color:var(--g2);margin-top:1px;}
+
+/* clients */
+.clients{background:var(--white);border-top:1px solid var(--g4);padding:16px 48px;display:flex;align-items:center;gap:28px;}
+.cl-lbl{font-size:10.5px;color:var(--g2);font-weight:600;letter-spacing:1.2px;text-transform:uppercase;white-space:nowrap;flex-shrink:0;}
+.cl-div{width:1px;height:18px;background:var(--g4);flex-shrink:0;}
+.cl-scroll{flex:1;overflow:hidden;mask-image:linear-gradient(90deg,transparent 0%,black 7%,black 93%,transparent 100%);-webkit-mask-image:linear-gradient(90deg,transparent 0%,black 7%,black 93%,transparent 100%);}
+.cl-track{display:flex;gap:44px;align-items:center;animation:mq 22s linear infinite;}
+.cl-track:hover{animation-play-state:paused;}
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.cl-name{font-family:'Plus Jakarta Sans',sans-serif;font-size:12.5px;font-weight:700;color:var(--g3);white-space:nowrap;transition:color .18s;}
+.cl-name:hover{color:var(--g2);}
+
+/* ── LIVE DOT ── */
+.live-dot{display:inline-block;width:7px;height:7px;background:#EF4444;border-radius:50%;margin-right:4px;animation:livepulse 1.4s ease-in-out infinite;}
+.live-dot-inline{display:inline-block;width:5px;height:5px;background:#EF4444;border-radius:50%;margin-right:4px;animation:livepulse 1.4s ease-in-out infinite;vertical-align:middle;}
+.live-badge{display:inline-flex;align-items:center;font-size:9px;font-weight:700;color:var(--red);letter-spacing:.6px;}
+@keyframes livepulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+
+/* ── CREAR FORM ── */
+.crear-form{display:flex;flex-direction:column;gap:10px;flex:1;}
+.cf-field{display:flex;flex-direction:column;gap:4px;}
+.cf-label{font-size:10px;font-weight:600;color:var(--g1);text-transform:uppercase;letter-spacing:.5px;}
+.cf-input{padding:7px 10px;border:1.5px solid var(--g4);border-radius:7px;font-size:11.5px;color:var(--navy);outline:none;font-family:'Inter',sans-serif;background:var(--white);transition:border-color .14s;}
+.cf-input:focus{border-color:var(--cyan);}
+.cf-select{appearance:none;cursor:pointer;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%2394A3B8' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px;}
+.cf-textarea{resize:none;height:52px;line-height:1.55;}
+.cf-pills{display:flex;gap:5px;flex-wrap:wrap;}
+.cf-pill{padding:4px 10px;border:1.5px solid var(--g4);border-radius:6px;font-size:10px;font-weight:600;color:var(--g2);cursor:pointer;transition:all .12s;background:var(--white);}
+.cf-pill.active{border-color:var(--cyan);color:var(--cyan-dk);background:var(--cyan-lt);}
+.cf-pill-high.active{border-color:var(--orange);color:#92400E;background:#FEF3C7;}
+.cf-pill-crit.active{border-color:var(--red);color:var(--red);background:#FEE2E2;}
+.cf-tags-wrap{display:flex;gap:5px;flex-wrap:wrap;}
+.cf-tag-item{padding:3px 9px;border:1.5px solid var(--g4);border-radius:100px;font-size:10px;font-weight:500;color:var(--g2);cursor:pointer;transition:all .12s;background:var(--white);}
+.cf-tag-item.active{border-color:var(--cyan);color:var(--cyan-dk);background:var(--cyan-lt);}
+.cf-btn-main{padding:9px 20px;background:var(--cyan);color:#fff;border:none;border-radius:7px;font-size:12px;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;}
+.cf-btn-main:hover{background:var(--cyan-dk);}
+.cf-btn-ghost{padding:9px 20px;background:transparent;color:var(--g1);border:1.5px solid var(--g4);border-radius:7px;font-size:12px;font-weight:500;cursor:pointer;font-family:'Inter',sans-serif;transition:all .15s;}
+.cf-btn-ghost:hover{border-color:var(--g3);color:var(--navy);}
+.cf-success{display:none;align-items:center;gap:10px;background:#F0FDF4;border:1.5px solid #A7F3D0;border-radius:9px;padding:10px 14px;margin-top:4px;}
+.cf-success.show{display:flex;}
+.cf-success-icon{width:28px;height:28px;border-radius:50%;background:var(--green);color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.cf-success-title{font-size:12px;font-weight:700;color:#065F46;}
+.cf-success-sub{font-size:10.5px;color:var(--green);}
+
+/* ── MONITOR ── */
+.mon-kpi{background:var(--white);border:1px solid var(--g4);border-radius:9px;padding:10px 12px;}
+.mon-kpi-label{font-size:9.5px;color:var(--g2);font-weight:500;text-transform:uppercase;letter-spacing:.4px;}
+.mon-kpi-val{font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:22px;color:var(--navy);margin:2px 0;}
+.mon-kpi-bar{height:4px;background:var(--g4);border-radius:2px;overflow:hidden;}
+.mon-bar-fill{height:100%;border-radius:2px;transition:width .6s ease;}
+.mon-feed{display:flex;flex-direction:column;gap:5px;flex:1;overflow-y:auto;}
+.mon-feed::-webkit-scrollbar{width:2px;}
+.mon-feed::-webkit-scrollbar-thumb{background:var(--g3);}
+.mon-event{display:flex;align-items:flex-start;gap:9px;padding:8px 10px;border:1px solid var(--g4);border-radius:8px;background:var(--white);animation:slideIn .35s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.mon-event.new{animation:slideIn .35s ease;}
+.mon-ev-ico{width:24px;height:24px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;}
+.mon-ev-done .mon-ev-ico{background:#D1FAE5;color:var(--green);}
+.mon-ev-warn .mon-ev-ico{background:#FEE2E2;color:var(--red);}
+.mon-ev-info .mon-ev-ico{background:var(--cyan-lt);color:var(--cyan-dk);}
+.mon-ev-body{flex:1;}
+.mon-ev-title{font-size:11px;font-weight:600;color:var(--navy);}
+.mon-ev-sub{font-size:9.5px;color:var(--g2);margin-top:1px;}
+.mon-ev-time{font-size:9px;color:var(--g3);white-space:nowrap;margin-top:2px;flex-shrink:0;}
+
+/* ── CHAT ── */
+.chat-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--white);border-bottom:1px solid var(--g4);flex-shrink:0;}
+.chat-channel-icon{width:28px;height:28px;border-radius:7px;background:var(--cyan-lt);color:var(--cyan-dk);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;flex-shrink:0;}
+.chat-channel-name{font-size:12px;font-weight:700;color:var(--navy);}
+.chat-channel-sub{font-size:9.5px;color:var(--g2);}
+.chat-messages{flex:1;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;background:var(--bg);}
+.chat-messages::-webkit-scrollbar{width:2px;}
+.chat-messages::-webkit-scrollbar-thumb{background:var(--g3);}
+.chat-date-divider{text-align:center;font-size:9.5px;color:var(--g2);font-weight:600;letter-spacing:.5px;position:relative;}
+.chat-date-divider::before,.chat-date-divider::after{content:'';position:absolute;top:50%;width:30%;height:1px;background:var(--g4);}
+.chat-date-divider::before{left:0;} .chat-date-divider::after{right:0;}
+.chat-msg{display:flex;align-items:flex-start;gap:8px;}
+.chat-msg-me{flex-direction:row-reverse;}
+.chat-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:8.5px;font-weight:700;color:#fff;flex-shrink:0;margin-top:2px;}
+.chat-bubble-wrap{display:flex;flex-direction:column;gap:3px;max-width:80%;}
+.chat-meta{display:flex;align-items:center;gap:6px;}
+.chat-name{font-size:10.5px;font-weight:700;color:var(--navy);}
+.chat-time{font-size:9px;color:var(--g2);}
+.chat-bubble{background:var(--white);border:1px solid var(--g4);border-radius:10px;padding:7px 10px;font-size:11px;color:var(--navy);line-height:1.5;box-shadow:0 1px 4px rgba(0,0,0,.04);}
+.chat-bubble-me{background:var(--cyan);border-color:var(--cyan);color:#fff;box-shadow:0 2px 8px rgba(0,169,179,.2);}
+.chat-attachment{display:flex;align-items:center;gap:5px;background:var(--bg2);border:1px solid var(--g4);border-radius:6px;padding:5px 8px;font-size:10px;color:var(--g1);margin-top:3px;cursor:pointer;transition:border-color .12s;}
+.chat-attachment:hover{border-color:var(--cyan);}
+.chat-task-ref{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1px solid var(--g4);border-radius:6px;padding:5px 8px;margin-top:3px;cursor:pointer;transition:border-color .12s;}
+.chat-task-ref:hover{border-color:var(--cyan);}
+.ctr-id{font-size:9.5px;font-weight:700;color:var(--cyan);}
+.ctr-title{font-size:10px;font-weight:500;color:var(--navy);flex:1;}
+.ctr-status{font-size:9px;font-weight:600;padding:2px 6px;border-radius:4px;}
+.chat-input-wrap{padding:10px 14px;background:var(--white);border-top:1px solid var(--g4);flex-shrink:0;}
+.chat-input-box{display:flex;align-items:center;gap:6px;background:var(--bg2);border:1.5px solid var(--g4);border-radius:9px;padding:5px 8px;transition:border-color .14s;}
+.chat-input-box:focus-within{border-color:var(--cyan);}
+.chat-input{flex:1;border:none;background:transparent;font-size:11.5px;color:var(--navy);outline:none;font-family:'Inter',sans-serif;}
+.chat-input-actions{display:flex;gap:4px;align-items:center;}
+.chat-icon-btn{background:transparent;border:none;cursor:pointer;font-size:13px;padding:2px;opacity:.6;transition:opacity .12s;}
+.chat-icon-btn:hover{opacity:1;}
+.chat-send{background:var(--cyan);border:none;border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;}
+.chat-send:hover{background:var(--cyan-dk);}
+.chat-msg-new{animation:slideIn .3s ease;}
+
+.sb-live-dot{width:6px;height:6px;background:var(--red);border-radius:50%;animation:livepulse 1.4s ease-in-out infinite;flex-shrink:0;}
+.sb-badge{font-size:8.5px;font-weight:700;padding:1px 5px;border-radius:100px;background:var(--cyan-lt);color:var(--cyan-dk);flex-shrink:0;}
+.sb-badge-warn{background:#FEE2E2;color:var(--red);}
+/* ── CAMAS ── */
+.camas-piso-label{font-size:10px;font-weight:700;color:var(--g1);letter-spacing:.5px;text-transform:uppercase;margin-bottom:6px;margin-top:2px;}
+.camas-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;}
+.cama-cell{aspect-ratio:1.2;border-radius:5px;border:1px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .12s;font-size:7.5px;font-weight:600;gap:1px;}
+.cama-cell:hover{transform:scale(1.08);z-index:5;box-shadow:0 2px 8px rgba(0,0,0,.12);}
+.cama-libre{background:#F0FDF4;border-color:#A7F3D0;color:#065F46;}
+.cama-ocupada{background:#FEF2F2;border-color:#FECACA;color:var(--red);}
+.cama-limpieza{background:#FFFBEB;border-color:#FDE68A;color:#92400E;}
+.cama-reservada{background:#E0F7F9;border-color:#A5F3FC;color:var(--cyan-dk);}
+.cama-icon{font-size:10px;}
+/* ── OFERTA MÉDICA ── */
+.oferta-grid{display:flex;flex-direction:column;gap:8px;}
+.oferta-card{background:var(--white);border:1px solid var(--g4);border-radius:10px;padding:10px 12px;transition:border-color .15s,box-shadow .15s;}
+.oferta-card:hover{border-color:rgba(0,169,179,.3);box-shadow:0 2px 12px rgba(0,169,179,.08);}
+.oc-header{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.oc-icon{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.oc-esp{font-size:12px;font-weight:700;color:var(--navy);}
+.oc-sub{font-size:9.5px;color:var(--g2);margin-top:1px;}
+.oc-badge{margin-left:auto;font-size:9px;font-weight:600;padding:2px 8px;border-radius:100px;flex-shrink:0;}
+.oc-doctors{display:flex;flex-direction:column;gap:5px;}
+.oc-doc{display:flex;align-items:center;gap:7px;padding:5px 7px;background:var(--bg2);border-radius:7px;}
+.oc-av{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;color:#fff;flex-shrink:0;}
+.oc-doc-info{flex:1;min-width:0;}
+.oc-doc-name{font-size:10.5px;font-weight:600;color:var(--navy);}
+.oc-doc-hrs{font-size:9px;color:var(--g2);}
+.oc-slots{display:flex;gap:3px;flex-shrink:0;}
+.oc-slot{font-size:8.5px;font-weight:600;padding:2px 5px;border-radius:4px;cursor:pointer;transition:all .12s;}
+.oc-slot-ok{background:#D1FAE5;color:#065F46;}
+.oc-slot-ok:hover{background:var(--green);color:#fff;}
+.oc-slot-busy{background:var(--g4);color:var(--g2);cursor:not-allowed;text-decoration:line-through;}
+@media(max-width:1000px){nav{padding:0 20px;} .nav-links{display:none;} .hero{padding:86px 20px 56px;} .hero-inner{grid-template-columns:1fr;gap:40px;} .widget-wrap{transform:none!important;} .fc-1{display:none;} .clients{padding:14px 20px;}}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a href="/" class="nav-logo">
+      <svg width="26" height="26" viewBox="0 0 60 60" fill="none">
+        <circle cx="20" cy="42" r="14" fill="#00A9B3"/>
+        <circle cx="40" cy="22" r="12" fill="#00A9B3"/>
+        <line x1="26" y1="30" x2="13" y2="21" stroke="#00A9B3" stroke-width="5" stroke-linecap="round"/>
+        <line x1="34" y1="30" x2="47" y2="21" stroke="#00A9B3" stroke-width="5" stroke-linecap="round"/>
+        <line x1="22" y1="37" x2="9" y2="37" stroke="#00A9B3" stroke-width="5" stroke-linecap="round"/>
+        <line x1="36" y1="12" x2="29" y2="2" stroke="#00A9B3" stroke-width="4" stroke-linecap="round"/>
+        <line x1="44" y1="12" x2="52" y2="3" stroke="#00A9B3" stroke-width="4" stroke-linecap="round"/>
+      </svg>
+      <span class="nav-logo-text">Oper<em>On</em></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#" class="act">Inicio</a></li>
+      <li><a href="#">Plataforma</a></li>
+      <li><a href="#">Soluciones</a></li>
+      <li><a href="#">Recursos</a></li>
+      <li><a href="#">Contacto</a></li>
+    </ul>
+    <div class="nav-cta">
+      <a href="#" class="nb-ghost">Ver soluciones</a>
+      <a href="#" class="nb-filled">Agenda una reunión</a>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="dotgrid"></div>
+  <canvas id="pcanvas"></canvas>
+
+  <div class="hero-inner">
+
+    <!-- LEFT -->
+    <div class="hero-left" id="heroLeft">
+      <div class="badge"><span class="badge-dot"></span>Plataforma de Gestión Operacional</div>
+      <h1 class="hero-title">Digitaliza y controla<br>tu operación<br><span class="accent">en tiempo real</span></h1>
+      <p class="hero-sub">OperOn conecta a tus equipos, <strong>estandariza procesos</strong> y te da visibilidad completa sobre cada tarea, activo y flujo operacional, desde cualquier industria.</p>
+      <div class="hero-actions">
+        <a href="#" class="cta-a">
+          <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="white" stroke-width="1.5"/><path d="M5 2v2M11 2v2M2 7h12" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Agendar reunión
+        </a>
+        <a href="#" class="cta-b">Ver plataforma <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="metrics">
+        <div class="met"><div class="met-val" data-target="7">0<em>+ ind.</em></div><div class="met-lbl">Industrias</div></div>
+        <div class="met-sep"></div>
+        <div class="met"><div class="met-val" data-target="100">0</div><div class="met-lbl">Procesos digitalizados</div></div>
+        <div class="met-sep"></div>
+        <div class="met"><div class="met-val" data-target="6">0</div><div class="met-lbl">Clientes activos</div></div>
+      </div>
+    </div>
+
+    <!-- RIGHT: PLATFORM WIDGET -->
+    <div style="position:relative;" id="mockupScene">
+
+      <!-- Float badge -->
+      <div class="fc fc-1">
+        <div class="fc-ico fci-g">✓</div>
+        <div><div class="fc-v">Alta completada</div><div class="fc-l">Proceso finalizado · hace 2 min</div></div>
+      </div>
+
+      <div class="widget-wrap" id="mainCard">
+
+        <!-- App bar -->
+        <div class="app-bar">
+          <div class="app-bar-left">
+            <div class="app-ham"><span></span><span></span><span></span></div>
+            <span class="app-logo-sm">Oper<em>On</em></span>
+          </div>
+          <div class="app-bar-right">
+            <span class="app-refresh">↻ Actualizar 11:14 a.m.</span>
+            <button class="app-btn-sm">+ Nueva tarea</button>
+          </div>
+        </div>
+
+        <!-- Body -->
+        <div class="app-body">
+
+          <!-- Sidebar -->
+          <div class="sidebar">
+            <div class="sb-section">Operaciones</div>
+            <div class="sb-item active" onclick="switchSb(this,'tareas')">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+              Tareas
+            </div>
+            <div class="sb-item" onclick="switchSb(this,'crear')">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.4"/><path d="M8 5v6M5 8h6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Crear tarea
+            </div>
+            <div class="sb-item" onclick="switchSb(this,'monitor')">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="3" fill="currentColor" opacity=".3"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.2" stroke-dasharray="2 2"/></svg>
+              <span style="flex:1">Monitor</span><span class="sb-live-dot"></span>
+            </div>
+            <div class="sb-item" onclick="switchSb(this,'chat')">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 3h12v8H9l-3 2V11H2V3z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+              <span style="flex:1">Comunicación</span><span class="sb-badge">3</span>
+            </div>
+            <div class="sb-section">Clínico</div>
+            <div class="sb-item" onclick="switchSb(this,'pacientes')">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="5" r="3" stroke="currentColor" stroke-width="1.4"/><path d="M2 14c0-3.3 2.7-6 6-6s6 2.7 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Pacientes
+            </div>
+            <div class="sb-item" onclick="switchSb(this,'camas')">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="1" y="8" width="14" height="5" rx="1.5" stroke="currentColor" stroke-width="1.4"/><path d="M1 10V6a2 2 0 012-2h4v6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="4.5" cy="5.5" r="1" fill="currentColor"/></svg>
+              Camas
+              <span class="sb-badge sb-badge-warn">2</span>
+            </div>
+            <div class="sb-item" onclick="switchSb(this,'oferta')">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3 3.5.5-2.5 2.5.5 3.5L8 10l-3 1.5.5-3.5L3 5.5 6.5 5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+              Oferta Médica
+            </div>
+            <div class="sb-section">Análisis</div>
+            <div class="sb-item" onclick="switchSb(this,'kpis')">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M2 13l4-4 3 3 5-7" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              KPIs
+            </div>
+            <div class="sb-item" onclick="switchSb(this,'kpis')">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><rect x="2" y="8" width="3" height="6" rx="1" fill="currentColor" opacity=".5"/><rect x="6.5" y="5" width="3" height="9" rx="1" fill="currentColor" opacity=".7"/><rect x="11" y="2" width="3" height="12" rx="1" fill="currentColor"/></svg>
+              Reportes
+            </div>
+            <div class="sb-section">Config.</div>
+            <div class="sb-item">
+              <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="2" stroke="currentColor" stroke-width="1.4"/><path d="M8 1v2M8 13v2M1 8h2M13 8h2M3.2 3.2l1.4 1.4M11.4 11.4l1.4 1.4M3.2 12.8l1.4-1.4M11.4 4.6l1.4-1.4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              Maestros
+            </div>
+            <div class="sb-avatar">
+              <div class="sb-av-circle">AC</div>
+              <div><div class="sb-av-txt">Usuario</div><div class="sb-av-role">Admin</div></div>
+            </div>
+          </div>
+
+          <!-- Content -->
+          <div class="app-content">
+
+            <!-- TABS -->
+            <div class="tab-bar">
+              <button class="tab-btn active" data-tab="tareas" onclick="switchTab(this)">Tareas — Planner</button>
+              <button class="tab-btn" data-tab="kpis" onclick="switchTab(this)">Dashboard KPIs</button>
+              <button class="tab-btn" data-tab="pacientes" onclick="switchTab(this)">Pacientes</button>
+              <button class="tab-btn" data-tab="camas" onclick="switchTab(this)">🛏 Camas</button>
+              <button class="tab-btn" data-tab="oferta" onclick="switchTab(this)">⭐ Oferta Médica</button>
+              <button class="tab-btn" data-tab="crear" onclick="switchTab(this)">✚ Crear tarea</button>
+              <button class="tab-btn" data-tab="monitor" onclick="switchTab(this)"><span class="live-dot"></span>Monitor</button>
+              <button class="tab-btn" data-tab="chat" onclick="switchTab(this)">💬 Comunicación</button>
+            </div>
+
+            <!-- ── PANEL: TAREAS ── -->
+            <div class="tab-panel active" id="panel-tareas">
+              <!-- KPI strip -->
+              <div style="display:flex;gap:6px;flex-shrink:0;">
+                <div style="flex:1;background:var(--white);border:1px solid var(--g4);border-radius:7px;padding:7px 9px;display:flex;align-items:center;gap:6px;">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#64748B" stroke-width="1.4"/><path d="M8 5v3l2 2" stroke="#64748B" stroke-width="1.4" stroke-linecap="round"/></svg>
+                  <div><div style="font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;color:var(--navy);">536</div><div style="font-size:8.5px;color:var(--g2);text-transform:uppercase;letter-spacing:.4px;">Total</div></div>
+                </div>
+                <div style="flex:1;background:var(--white);border:1px solid var(--g4);border-radius:7px;padding:7px 9px;display:flex;align-items:center;gap:6px;">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 4v4l2 2" stroke="#EF4444" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="8" r="6" stroke="#EF4444" stroke-width="1.4"/></svg>
+                  <div><div style="font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;color:var(--red);">112</div><div style="font-size:8.5px;color:var(--g2);text-transform:uppercase;letter-spacing:.4px;">Vencidas</div></div>
+                </div>
+                <div style="flex:1;background:var(--white);border:1px solid var(--g4);border-radius:7px;padding:7px 9px;display:flex;align-items:center;gap:6px;">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#F59E0B" stroke-width="1.4"/><path d="M5 2v2M11 2v2M2 7h12" stroke="#F59E0B" stroke-width="1.4" stroke-linecap="round"/></svg>
+                  <div><div style="font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;color:var(--orange);">56</div><div style="font-size:8.5px;color:var(--g2);text-transform:uppercase;letter-spacing:.4px;">Hoy</div></div>
+                </div>
+                <div style="flex:1;background:var(--white);border:1px solid var(--g4);border-radius:7px;padding:7px 9px;display:flex;align-items:center;gap:6px;">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 13l4-4 3 2 5-7" stroke="#00A9B3" stroke-width="1.4" stroke-linecap="round"/></svg>
+                  <div><div style="font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;color:var(--cyan);">183</div><div style="font-size:8.5px;color:var(--g2);text-transform:uppercase;letter-spacing:.4px;">7 días</div></div>
+                </div>
+                <div style="flex:1;background:var(--white);border:1px solid var(--g4);border-radius:7px;padding:7px 9px;display:flex;align-items:center;gap:6px;">
+                  <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="#10B981" stroke-width="1.4"/><path d="M5 8l2 2 4-4" stroke="#10B981" stroke-width="1.4" stroke-linecap="round"/></svg>
+                  <div><div style="font-size:13px;font-weight:700;font-family:'Plus Jakarta Sans',sans-serif;color:var(--green);">138</div><div style="font-size:8.5px;color:var(--g2);text-transform:uppercase;letter-spacing:.4px;">Finalizadas</div></div>
+                </div>
+              </div>
+
+              <!-- Filters -->
+              <div class="filter-row">
+                <span class="filter-chip on">Enfermedad</span>
+                <span class="filter-chip">Responsable</span>
+                <span class="filter-chip">Estado</span>
+                <span class="filter-chip">Prioridad</span>
+              </div>
+
+              <!-- Kanban -->
+              <div class="kanban">
+                <div class="k-col col-vencidas">
+                  <div class="k-col-header"><div class="k-col-title">❤ Vencidas <span class="k-badge">112</span></div></div>
+                  <div class="k-cards">
+                    <div class="k-card"><div class="k-card-id">#593</div><div class="k-card-title">Control de presión arterial</div><div class="k-card-name">Carlos Ramírez</div><div class="k-card-tags"><span class="k-tag tag-pend">Pendiente</span><span class="k-tag tag-venc">1 día vencida</span></div></div>
+                    <div class="k-card"><div class="k-card-id">#594</div><div class="k-card-title">Evaluación de heridas</div><div class="k-card-name">Laura Fernández</div><div class="k-card-tags"><span class="k-tag tag-pend">Pendiente</span><span class="k-tag tag-venc">1 día vencida</span></div></div>
+                    <div class="k-card"><div class="k-card-id">#571</div><div class="k-card-title">Administración medicamentos</div><div class="k-card-name">Pedro Soto</div><div class="k-card-tags"><span class="k-tag tag-pend">Pendiente</span><span class="k-tag tag-venc">3 días vencida</span></div></div>
+                    <span class="k-ver-link">Ver todas (112) →</span>
+                  </div>
+                </div>
+
+                <div class="k-col col-hoy">
+                  <div class="k-col-header"><div class="k-col-title">⭐ Hoy <span class="k-badge">56</span></div></div>
+                  <div class="k-cards">
+                    <div class="k-card"><div class="k-card-id">#619</div><div class="k-card-title">Registro de signos vitales</div><div class="k-card-name">Mateo González</div><div class="k-card-tags"><span class="k-tag tag-pend">Pendiente</span><span class="k-tag tag-noej">No ejecutada</span></div></div>
+                    <div class="k-card"><div class="k-card-id">#622</div><div class="k-card-title">Llamado de seguimiento</div><div class="k-card-name">Camila Díaz</div><div class="k-card-tags"><span class="k-tag tag-prog">En curso</span></div></div>
+                    <div class="k-card"><div class="k-card-id">#615</div><div class="k-card-title">Curación post-operatoria</div><div class="k-card-name">Ana Torres</div><div class="k-card-tags"><span class="k-tag tag-pend">Pendiente</span></div></div>
+                    <span class="k-ver-link">Ver todas (56) →</span>
+                  </div>
+                </div>
+
+                <div class="k-col col-proximas">
+                  <div class="k-col-header"><div class="k-col-title">+ Próximas <span class="k-badge">183</span></div></div>
+                  <div class="k-cards">
+                    <div class="k-card"><div class="k-card-id">#592</div><div class="k-card-title">Evaluación de movilidad</div><div class="k-card-name">Isabella Rojas</div><div class="k-card-tags"><span class="k-tag tag-pend">Pendiente</span><span class="k-tag tag-prog">Programada</span></div><div style="font-size:8.5px;color:var(--cyan);margin-top:4px;">+ Vence en 2 días</div></div>
+                    <div class="k-card"><div class="k-card-id">#605</div><div class="k-card-title">Coordinación de exámenes</div><div class="k-card-name">Sebastián Moreau</div><div class="k-card-tags"><span class="k-tag tag-noej">No ejecutada</span></div><div style="font-size:8.5px;color:var(--cyan);margin-top:4px;">+ Vence en 3 días</div></div>
+                    <span class="k-ver-link">Ver todas (183) →</span>
+                  </div>
+                </div>
+
+                <div class="k-col col-finalizadas">
+                  <div class="k-col-header"><div class="k-col-title">✓ Finalizadas <span class="k-badge">138</span></div></div>
+                  <div class="k-cards">
+                    <div class="k-card"><div class="k-card-id">#580</div><div class="k-card-title">Evaluación inicial completada</div><div class="k-card-name">Tomás Alarcón</div><div class="k-card-tags"><span class="k-tag tag-fin">Finalizada</span></div><div style="font-size:8.5px;color:var(--green);margin-top:4px;">✓ Completada el 10/06</div></div>
+                    <div class="k-card"><div class="k-card-id">#581</div><div class="k-card-title">Firma de consentimiento</div><div class="k-card-name">Ignacio Paredes</div><div class="k-card-tags"><span class="k-tag tag-fin">Finalizada</span></div><div style="font-size:8.5px;color:var(--green);margin-top:4px;">✓ Completada el 09/06</div></div>
+                    <span class="k-ver-link">Ver todas (138) →</span>
+                  </div>
+                </div>
+              </div>
+            </div><!-- /panel-tareas -->
+
+            <!-- ── PANEL: KPIs ── -->
+            <div class="tab-panel" id="panel-kpis">
+              <div class="view-header" style="flex-shrink:0;">
+                <div><div class="view-title">Dashboard Operacional</div><div class="view-sub">Período: Jun 2025 · Actualizado hace 3 min</div></div>
+              </div>
+              <div class="dash-grid">
+                <div class="dash-kpi"><div class="dk-label">Tareas completadas</div><div class="dk-val gr">138</div><div class="dk-trend">↑ +12.4% vs mes anterior</div></div>
+                <div class="dash-kpi"><div class="dk-label">Tiempo promedio</div><div class="dk-val">2.4 <span style="font-size:13px;font-weight:500;color:var(--g2);">hrs</span></div><div class="dk-trend neu">— Sin variación</div></div>
+                <div class="dash-kpi"><div class="dk-label">Tareas vencidas</div><div class="dk-val or">112</div><div class="dk-trend down">↓ −8.1% vs mes anterior</div></div>
+                <div class="dash-kpi"><div class="dk-label">Cumplimiento SLA</div><div class="dk-val cy">87%</div><div class="dk-trend">↑ +3.2% vs mes anterior</div></div>
+                <div class="dash-kpi"><div class="dk-label">Activos gestionados</div><div class="dk-val">755</div><div class="dk-trend">↑ +45 nuevos este mes</div></div>
+                <div class="dash-kpi"><div class="dk-label">Usuarios activos</div><div class="dk-val">24</div><div class="dk-trend neu">— Estable</div></div>
+              </div>
+              <div class="dash-chart">
+                <div class="dc-header"><span class="dc-title">Tareas por semana</span><span class="dc-range">Últimas 8 semanas</span></div>
+                <div style="display:flex;align-items:flex-end;gap:4px;height:60px;">
+                  <div class="bc-group"><div class="bc-bar" style="height:38%;background:var(--cyan);opacity:.5;"></div><div class="bc-label">S1</div></div>
+                  <div class="bc-group"><div class="bc-bar" style="height:52%;background:var(--cyan);opacity:.6;"></div><div class="bc-label">S2</div></div>
+                  <div class="bc-group"><div class="bc-bar" style="height:44%;background:var(--cyan);opacity:.65;"></div><div class="bc-label">S3</div></div>
+                  <div class="bc-group"><div class="bc-bar" style="height:70%;background:var(--green);opacity:.7;"></div><div class="bc-label">S4</div></div>
+                  <div class="bc-group"><div class="bc-bar" style="height:62%;background:var(--cyan);opacity:.7;"></div><div class="bc-label">S5</div></div>
+                  <div class="bc-group"><div class="bc-bar" style="height:82%;background:var(--green);"></div><div class="bc-label">S6</div></div>
+                  <div class="bc-group"><div class="bc-bar" style="height:74%;background:var(--cyan);opacity:.85;"></div><div class="bc-label">S7</div></div>
+                  <div class="bc-group"><div class="bc-bar" style="height:91%;background:var(--green);"></div><div class="bc-label">S8</div></div>
+                </div>
+              </div>
+              <div class="dash-row2">
+                <div class="dash-list">
+                  <div class="dl-title">Top procesos</div>
+                  <div class="dl-item"><div class="dl-dot" style="background:var(--cyan)"></div><div class="dl-name">Alta de pacientes</div><div class="dl-val">42</div></div>
+                  <div class="dl-item"><div class="dl-dot" style="background:var(--green)"></div><div class="dl-name">Housekeeping</div><div class="dl-val">38</div></div>
+                  <div class="dl-item"><div class="dl-dot" style="background:var(--orange)"></div><div class="dl-name">Mantenimiento</div><div class="dl-val">29</div></div>
+                  <div class="dl-item"><div class="dl-dot" style="background:var(--purple)"></div><div class="dl-name">Control calidad</div><div class="dl-val">17</div></div>
+                </div>
+                <div class="dash-list">
+                  <div class="dl-title">Por industria</div>
+                  <div class="dl-item"><div class="dl-dot" style="background:var(--cyan)"></div><div class="dl-name">Salud y clínicas</div><div class="dl-val">48%</div></div>
+                  <div class="dl-item"><div class="dl-dot" style="background:var(--green)"></div><div class="dl-name">Hotelería</div><div class="dl-val">22%</div></div>
+                  <div class="dl-item"><div class="dl-dot" style="background:var(--orange)"></div><div class="dl-name">Manufactura</div><div class="dl-val">18%</div></div>
+                  <div class="dl-item"><div class="dl-dot" style="background:var(--purple)"></div><div class="dl-name">Construcción</div><div class="dl-val">12%</div></div>
+                </div>
+              </div>
+            </div><!-- /panel-kpis -->
+
+            <!-- ── PANEL: PACIENTES ── -->
+            <div class="tab-panel" id="panel-pacientes">
+              <div class="pac-header">
+                <div><div class="view-title">Pacientes</div><div class="view-sub">124 pacientes activos · Actualizado 11:14 a.m.</div></div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <input class="pac-search" type="text" placeholder="Buscar paciente..." />
+                  <span class="filter-chip on">Todos</span>
+                  <span class="filter-chip">Críticos</span>
+                  <span class="filter-chip">Alta</span>
+                </div>
+              </div>
+              <div class="pac-table">
+                <div class="pt-head">
+                  <div class="pt-th">Paciente</div>
+                  <div class="pt-th">Servicio</div>
+                  <div class="pt-th">Estado</div>
+                  <div class="pt-th">Próx. tarea</div>
+                  <div class="pt-th">Avance</div>
+                </div>
+                <div class="pt-body">
+                  <div class="pt-row"><div class="pt-cell"><div class="pt-name">María González</div><div class="pt-sub">Hab. 301 · Dr. Ramírez</div></div><div class="pt-cell" style="font-size:10px;color:var(--g1);">Cardiología</div><div class="pt-cell"><span class="pt-status ps-seguim">● Seguimiento</span></div><div class="pt-cell" style="font-size:10px;color:var(--g1);">Control PA · Hoy</div><div class="pt-cell"><div class="pt-prog-bar"><div class="pt-prog-fill" style="width:68%;"></div></div><div style="font-size:8.5px;color:var(--g2);margin-top:2px;">68%</div></div></div>
+                  <div class="pt-row"><div class="pt-cell"><div class="pt-name">Carlos Herrera</div><div class="pt-sub">Hab. 215 · Dra. López</div></div><div class="pt-cell" style="font-size:10px;color:var(--g1);">Traumatología</div><div class="pt-cell"><span class="pt-status ps-critico">● Crítico</span></div><div class="pt-cell" style="font-size:10px;color:var(--red);">Evaluación · Vencida</div><div class="pt-cell"><div class="pt-prog-bar"><div class="pt-prog-fill" style="width:32%;background:var(--red);"></div></div><div style="font-size:8.5px;color:var(--g2);margin-top:2px;">32%</div></div></div>
+                  <div class="pt-row"><div class="pt-cell"><div class="pt-name">Ana Martínez</div><div class="pt-sub">Hab. 408 · Dr. Torres</div></div><div class="pt-cell" style="font-size:10px;color:var(--g1);">Pediatría</div><div class="pt-cell"><span class="pt-status ps-alta">● Alta médica</span></div><div class="pt-cell" style="font-size:10px;color:var(--green);">Completado ✓</div><div class="pt-cell"><div class="pt-prog-bar"><div class="pt-prog-fill" style="width:100%;background:var(--green);"></div></div><div style="font-size:8.5px;color:var(--g2);margin-top:2px;">100%</div></div></div>
+                  <div class="pt-row"><div class="pt-cell"><div class="pt-name">Roberto Silva</div><div class="pt-sub">Hab. 102 · Dr. Morales</div></div><div class="pt-cell" style="font-size:10px;color:var(--g1);">Neurología</div><div class="pt-cell"><span class="pt-status ps-espera">● En espera</span></div><div class="pt-cell" style="font-size:10px;color:var(--g1);">EEG · Mañana</div><div class="pt-cell"><div class="pt-prog-bar"><div class="pt-prog-fill" style="width:45%;background:var(--orange);"></div></div><div style="font-size:8.5px;color:var(--g2);margin-top:2px;">45%</div></div></div>
+                  <div class="pt-row"><div class="pt-cell"><div class="pt-name">Sofía Ruiz</div><div class="pt-sub">Hab. 320 · Dra. Vargas</div></div><div class="pt-cell" style="font-size:10px;color:var(--g1);">Oncología</div><div class="pt-cell"><span class="pt-status ps-seguim">● Seguimiento</span></div><div class="pt-cell" style="font-size:10px;color:var(--g1);">Lab. resultados · Hoy</div><div class="pt-cell"><div class="pt-prog-bar"><div class="pt-prog-fill" style="width:55%;"></div></div><div style="font-size:8.5px;color:var(--g2);margin-top:2px;">55%</div></div></div>
+                  <div class="pt-row"><div class="pt-cell"><div class="pt-name">Javier Moreno</div><div class="pt-sub">Hab. 509 · Dr. Castro</div></div><div class="pt-cell" style="font-size:10px;color:var(--g1);">Cirugía</div><div class="pt-cell"><span class="pt-status ps-critico">● Crítico</span></div><div class="pt-cell" style="font-size:10px;color:var(--red);">Post-op · Urgente</div><div class="pt-cell"><div class="pt-prog-bar"><div class="pt-prog-fill" style="width:20%;background:var(--red);"></div></div><div style="font-size:8.5px;color:var(--g2);margin-top:2px;">20%</div></div></div>
+                </div>
+              </div>
+            </div><!-- /panel-pacientes -->
+
+            <!-- ── PANEL: CAMAS ── -->
+            <div class="tab-panel" id="panel-camas">
+              <div class="view-header" style="flex-shrink:0;">
+                <div><div class="view-title">Gestión de Camas</div><div class="view-sub">Hospital Central · Actualizado 11:14 a.m.</div></div>
+                <div style="display:flex;gap:6px;align-items:center;">
+                  <span class="filter-chip on">Todos los pisos</span>
+                  <span class="filter-chip">Piso 2</span>
+                  <span class="filter-chip">Piso 3</span>
+                  <span class="filter-chip">UCI</span>
+                </div>
+              </div>
+              <!-- Summary strip -->
+              <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:7px;flex-shrink:0;">
+                <div class="dash-kpi"><div class="dk-label">Total camas</div><div class="dk-val">120</div><div class="dk-trend neu">4 pisos activos</div></div>
+                <div class="dash-kpi"><div class="dk-label">Ocupadas</div><div class="dk-val or">87</div><div class="dk-trend">72.5% ocupación</div></div>
+                <div class="dash-kpi"><div class="dk-label">Disponibles</div><div class="dk-val gr">28</div><div class="dk-trend">↑ +3 vs ayer</div></div>
+                <div class="dash-kpi"><div class="dk-label">En limpieza</div><div class="dk-val cy">5</div><div class="dk-trend down">⚠ 2 sin asignar</div></div>
+              </div>
+              <!-- Bed grid -->
+              <div style="flex:1;overflow-y:auto;">
+                <div class="camas-piso-label">Piso 3 — Cardiología (30 camas)</div>
+                <div class="camas-grid" id="camasGrid"></div>
+                <div class="camas-piso-label" style="margin-top:10px;">UCI — Unidad Crítica (16 camas)</div>
+                <div class="camas-grid" id="ucGrid"></div>
+              </div>
+              <!-- Legend -->
+              <div style="display:flex;gap:12px;flex-shrink:0;padding-top:4px;border-top:1px solid var(--g4);">
+                <div style="display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--g1);"><div style="width:10px;height:10px;border-radius:3px;background:#D1FAE5;border:1px solid #A7F3D0;"></div>Disponible</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--g1);"><div style="width:10px;height:10px;border-radius:3px;background:#FEE2E2;border:1px solid #FECACA;"></div>Ocupada</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--g1);"><div style="width:10px;height:10px;border-radius:3px;background:#FEF3C7;border:1px solid #FDE68A;"></div>En limpieza</div>
+                <div style="display:flex;align-items:center;gap:5px;font-size:9.5px;color:var(--g1);"><div style="width:10px;height:10px;border-radius:3px;background:#E0F7F9;border:1px solid #A5F3FC;"></div>Reservada</div>
+              </div>
+            </div><!-- /panel-camas -->
+
+            <!-- ── PANEL: OFERTA MÉDICA ── -->
+            <div class="tab-panel" id="panel-oferta">
+              <div class="view-header" style="flex-shrink:0;">
+                <div><div class="view-title">Oferta Médica</div><div class="view-sub">Especialidades, médicos y disponibilidad horaria</div></div>
+                <div style="display:flex;gap:6px;">
+                  <input class="pac-search" type="text" placeholder="Buscar especialidad..." style="max-width:160px;"/>
+                  <span class="filter-chip on">Todos</span>
+                  <span class="filter-chip">Con agenda</span>
+                </div>
+              </div>
+              <!-- Specialty cards -->
+              <div class="oferta-grid" style="flex:1;overflow-y:auto;">
+
+                <div class="oferta-card">
+                  <div class="oc-header">
+                    <div class="oc-icon" style="background:#EEF2FF;color:#4F46E5;">🫀</div>
+                    <div><div class="oc-esp">Cardiología</div><div class="oc-sub">4 médicos · 28 hrs disponibles</div></div>
+                    <span class="oc-badge" style="background:#D1FAE5;color:#065F46;">Disponible</span>
+                  </div>
+                  <div class="oc-doctors">
+                    <div class="oc-doc"><div class="oc-av" style="background:#4F46E5;">DR</div><div class="oc-doc-info"><div class="oc-doc-name">Dr. Ramírez</div><div class="oc-doc-hrs">Lun–Vie · 08:00–14:00</div></div><div class="oc-slots"><span class="oc-slot oc-slot-ok">08:00</span><span class="oc-slot oc-slot-ok">10:00</span><span class="oc-slot oc-slot-busy">12:00</span><span class="oc-slot oc-slot-ok">14:00</span></div></div>
+                    <div class="oc-doc"><div class="oc-av" style="background:#7C3AED;">ML</div><div class="oc-doc-info"><div class="oc-doc-name">Dra. López</div><div class="oc-doc-hrs">Mar–Sáb · 14:00–20:00</div></div><div class="oc-slots"><span class="oc-slot oc-slot-busy">14:00</span><span class="oc-slot oc-slot-ok">16:00</span><span class="oc-slot oc-slot-ok">18:00</span><span class="oc-slot oc-slot-busy">20:00</span></div></div>
+                  </div>
+                </div>
+
+                <div class="oferta-card">
+                  <div class="oc-header">
+                    <div class="oc-icon" style="background:#FEF3C7;color:#D97706;">🦴</div>
+                    <div><div class="oc-esp">Traumatología</div><div class="oc-sub">3 médicos · 16 hrs disponibles</div></div>
+                    <span class="oc-badge" style="background:#FEF3C7;color:#92400E;">Parcial</span>
+                  </div>
+                  <div class="oc-doctors">
+                    <div class="oc-doc"><div class="oc-av" style="background:#D97706;">AT</div><div class="oc-doc-info"><div class="oc-doc-name">Dr. Torres</div><div class="oc-doc-hrs">Lun–Jue · 09:00–13:00</div></div><div class="oc-slots"><span class="oc-slot oc-slot-busy">09:00</span><span class="oc-slot oc-slot-busy">10:00</span><span class="oc-slot oc-slot-ok">11:00</span><span class="oc-slot oc-slot-ok">13:00</span></div></div>
+                  </div>
+                </div>
+
+                <div class="oferta-card">
+                  <div class="oc-header">
+                    <div class="oc-icon" style="background:#FCE7F3;color:#BE185D;">🧠</div>
+                    <div><div class="oc-esp">Neurología</div><div class="oc-sub">2 médicos · 8 hrs disponibles</div></div>
+                    <span class="oc-badge" style="background:#FEE2E2;color:var(--red);">Sin agenda</span>
+                  </div>
+                  <div class="oc-doctors">
+                    <div class="oc-doc"><div class="oc-av" style="background:#BE185D;">SM</div><div class="oc-doc-info"><div class="oc-doc-name">Dra. Morales</div><div class="oc-doc-hrs">Mié–Vie · 08:00–12:00</div></div><div class="oc-slots"><span class="oc-slot oc-slot-busy">08:00</span><span class="oc-slot oc-slot-busy">09:00</span><span class="oc-slot oc-slot-busy">10:00</span><span class="oc-slot oc-slot-busy">12:00</span></div></div>
+                  </div>
+                </div>
+
+                <div class="oferta-card">
+                  <div class="oc-header">
+                    <div class="oc-icon" style="background:#ECFDF5;color:#059669;">🫁</div>
+                    <div><div class="oc-esp">Neumología</div><div class="oc-sub">2 médicos · 22 hrs disponibles</div></div>
+                    <span class="oc-badge" style="background:#D1FAE5;color:#065F46;">Disponible</span>
+                  </div>
+                  <div class="oc-doctors">
+                    <div class="oc-doc"><div class="oc-av" style="background:#059669;">PC</div><div class="oc-doc-info"><div class="oc-doc-name">Dr. Castro</div><div class="oc-doc-hrs">Lun–Sáb · 07:00–15:00</div></div><div class="oc-slots"><span class="oc-slot oc-slot-ok">08:00</span><span class="oc-slot oc-slot-ok">10:00</span><span class="oc-slot oc-slot-ok">12:00</span><span class="oc-slot oc-slot-ok">14:00</span></div></div>
+                  </div>
+                </div>
+
+              </div>
+            </div><!-- /panel-oferta -->
+
+            <!-- ── PANEL: CREAR TAREA ── -->
+            <div class="tab-panel" id="panel-crear">
+              <div class="view-header" style="flex-shrink:0;">
+                <div><div class="view-title">Nueva tarea</div><div class="view-sub">Completa los campos y asigna al equipo</div></div>
+              </div>
+              <div class="crear-form">
+                <!-- Título -->
+                <div class="cf-field">
+                  <label class="cf-label">Título de la tarea</label>
+                  <input class="cf-input" id="cf-titulo" type="text" placeholder="Ej: Control de presión arterial"/>
+                </div>
+                <!-- Tipo + Prioridad -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <div class="cf-field">
+                    <label class="cf-label">Tipo de proceso</label>
+                    <select class="cf-input cf-select" id="cf-tipo">
+                      <option value="">Seleccionar...</option>
+                      <option>Alta de paciente</option>
+                      <option>Housekeeping</option>
+                      <option>Mantenimiento</option>
+                      <option>Control de calidad</option>
+                      <option>Inspección</option>
+                    </select>
+                  </div>
+                  <div class="cf-field">
+                    <label class="cf-label">Prioridad</label>
+                    <div class="cf-pills" id="cf-prio">
+                      <span class="cf-pill" data-val="baja">Baja</span>
+                      <span class="cf-pill active" data-val="media">Media</span>
+                      <span class="cf-pill cf-pill-high" data-val="alta">Alta</span>
+                      <span class="cf-pill cf-pill-crit" data-val="critica">Crítica</span>
+                    </div>
+                  </div>
+                </div>
+                <!-- Responsable + Fecha -->
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+                  <div class="cf-field">
+                    <label class="cf-label">Responsable</label>
+                    <select class="cf-input cf-select" id="cf-resp">
+                      <option value="">Asignar a...</option>
+                      <option>Carlos Ramírez</option>
+                      <option>Laura Fernández</option>
+                      <option>Mateo González</option>
+                      <option>Isabella Rojas</option>
+                      <option>Ana Torres</option>
+                    </select>
+                  </div>
+                  <div class="cf-field">
+                    <label class="cf-label">Fecha límite</label>
+                    <input class="cf-input" id="cf-fecha" type="date"/>
+                  </div>
+                </div>
+                <!-- Descripción -->
+                <div class="cf-field">
+                  <label class="cf-label">Descripción</label>
+                  <textarea class="cf-input cf-textarea" id="cf-desc" placeholder="Detalla el procedimiento, materiales necesarios o instrucciones especiales..."></textarea>
+                </div>
+                <!-- Tags -->
+                <div class="cf-field">
+                  <label class="cf-label">Etiquetas</label>
+                  <div class="cf-tags-wrap" id="cf-tags">
+                    <span class="cf-tag-item active" data-t="urgente">Urgente</span>
+                    <span class="cf-tag-item" data-t="seguimiento">Seguimiento</span>
+                    <span class="cf-tag-item" data-t="protocolo">Protocolo</span>
+                    <span class="cf-tag-item" data-t="documentar">Documentar</span>
+                    <span class="cf-tag-item" data-t="supervisor">Supervisor</span>
+                  </div>
+                </div>
+                <!-- Botones -->
+                <div style="display:flex;gap:8px;margin-top:4px;">
+                  <button class="cf-btn-main" onclick="crearTarea()">Crear tarea</button>
+                  <button class="cf-btn-ghost">Guardar borrador</button>
+                </div>
+                <!-- Success state -->
+                <div class="cf-success" id="cf-success">
+                  <div class="cf-success-icon">✓</div>
+                  <div>
+                    <div class="cf-success-title">¡Tarea creada exitosamente!</div>
+                    <div class="cf-success-sub">Asignada a <span id="cf-success-name">—</span> · Aparece en el Planner</div>
+                  </div>
+                  <button class="cf-btn-ghost" style="margin-left:auto;" onclick="resetForm()">Nueva tarea</button>
+                </div>
+              </div>
+            </div><!-- /panel-crear -->
+
+            <!-- ── PANEL: MONITOR EN TIEMPO REAL ── -->
+            <div class="tab-panel" id="panel-monitor">
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-shrink:0;">
+                <div><div class="view-title">Monitor Operacional</div><div class="view-sub">Actualizaciones en tiempo real · <span class="live-badge"><span class="live-dot-inline"></span>LIVE</span></div></div>
+                <div style="display:flex;gap:6px;">
+                  <span class="filter-chip on" onclick="this.classList.toggle('on')">Todo</span>
+                  <span class="filter-chip" onclick="this.classList.toggle('on')">Alertas</span>
+                  <span class="filter-chip" onclick="this.classList.toggle('on')">Completados</span>
+                </div>
+              </div>
+              <!-- Metric cards live -->
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:7px;flex-shrink:0;">
+                <div class="mon-kpi" id="mon-activas">
+                  <div class="mon-kpi-label">Tareas activas</div>
+                  <div class="mon-kpi-val" id="mk-activas">47</div>
+                  <div class="mon-kpi-bar"><div class="mon-bar-fill" id="mb-activas" style="width:47%;background:var(--cyan);"></div></div>
+                </div>
+                <div class="mon-kpi" id="mon-alertas">
+                  <div class="mon-kpi-label">Alertas abiertas</div>
+                  <div class="mon-kpi-val" style="color:var(--red);" id="mk-alertas">8</div>
+                  <div class="mon-kpi-bar"><div class="mon-bar-fill" id="mb-alertas" style="width:8%;background:var(--red);"></div></div>
+                </div>
+                <div class="mon-kpi">
+                  <div class="mon-kpi-label">Completadas hoy</div>
+                  <div class="mon-kpi-val" style="color:var(--green);" id="mk-comp">23</div>
+                  <div class="mon-kpi-bar"><div class="mon-bar-fill" id="mb-comp" style="width:23%;background:var(--green);"></div></div>
+                </div>
+              </div>
+              <!-- Live feed -->
+              <div class="mon-feed" id="monFeed">
+                <div class="mon-event mon-ev-done"><span class="mon-ev-ico">✓</span><div class="mon-ev-body"><div class="mon-ev-title">Alta de paciente completada</div><div class="mon-ev-sub">María González · Hab. 301 · Carlos R.</div></div><span class="mon-ev-time">hace 0 min</span></div>
+                <div class="mon-event mon-ev-warn"><span class="mon-ev-ico">⚠</span><div class="mon-ev-body"><div class="mon-ev-title">Tarea vencida sin ejecutar</div><div class="mon-ev-sub">Control PA · #593 · Pedro Soto</div></div><span class="mon-ev-time">hace 1 min</span></div>
+                <div class="mon-event mon-ev-info"><span class="mon-ev-ico">→</span><div class="mon-ev-body"><div class="mon-ev-title">Nueva tarea asignada</div><div class="mon-ev-sub">Housekeeping piso 4 · Laura F.</div></div><span class="mon-ev-time">hace 3 min</span></div>
+                <div class="mon-event mon-ev-done"><span class="mon-ev-ico">✓</span><div class="mon-ev-body"><div class="mon-ev-title">Inspección de equipos finalizada</div><div class="mon-ev-sub">Planta Norte · Mateo G. · 45 min duración</div></div><span class="mon-ev-time">hace 4 min</span></div>
+                <div class="mon-event mon-ev-warn"><span class="mon-ev-ico">⚠</span><div class="mon-ev-body"><div class="mon-ev-title">Alerta: paciente crítico sin atención</div><div class="mon-ev-sub">Javier Moreno · Hab. 509 · Cirugía</div></div><span class="mon-ev-time">hace 6 min</span></div>
+                <div class="mon-event mon-ev-info"><span class="mon-ev-ico">ℹ</span><div class="mon-ev-body"><div class="mon-ev-title">Mantenimiento preventivo iniciado</div><div class="mon-ev-sub">Equipo #A-22 · Técnico: Roberto S.</div></div><span class="mon-ev-time">hace 8 min</span></div>
+              </div>
+            </div><!-- /panel-monitor -->
+
+            <!-- ── PANEL: COMUNICACIÓN ── -->
+            <div class="tab-panel" id="panel-chat" style="padding:0;gap:0;">
+              <!-- Chat header -->
+              <div class="chat-header">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div class="chat-channel-icon">#</div>
+                  <div>
+                    <div class="chat-channel-name">general-operaciones</div>
+                    <div class="chat-channel-sub">12 miembros · 3 en línea</div>
+                  </div>
+                </div>
+                <div style="display:flex;gap:6px;">
+                  <span class="filter-chip" style="font-size:9.5px;">📌 Anclados</span>
+                  <span class="filter-chip" style="font-size:9.5px;">👥 Miembros</span>
+                </div>
+              </div>
+              <!-- Messages -->
+              <div class="chat-messages" id="chatMessages">
+                <div class="chat-date-divider">Hoy, 11 de junio</div>
+                <div class="chat-msg">
+                  <div class="chat-av" style="background:var(--purple);">CR</div>
+                  <div class="chat-bubble-wrap">
+                    <div class="chat-meta"><span class="chat-name">Carlos Ramírez</span><span class="chat-time">10:32</span></div>
+                    <div class="chat-bubble">El paciente de hab. 301 está listo para el alta. ¿Alguien puede confirmar los papeles?</div>
+                  </div>
+                </div>
+                <div class="chat-msg">
+                  <div class="chat-av" style="background:var(--cyan);">AC</div>
+                  <div class="chat-bubble-wrap">
+                    <div class="chat-meta"><span class="chat-name">Ana Torres</span><span class="chat-time">10:35</span></div>
+                    <div class="chat-bubble">Confirmo. Los docs están firmados. Ya marqué la tarea #580 como completada ✓</div>
+                    <div class="chat-attachment"><span>📋</span> Alta_Paciente_301.pdf</div>
+                  </div>
+                </div>
+                <div class="chat-msg">
+                  <div class="chat-av" style="background:var(--orange);">LF</div>
+                  <div class="chat-bubble-wrap">
+                    <div class="chat-meta"><span class="chat-name">Laura Fernández</span><span class="chat-time">10:41</span></div>
+                    <div class="chat-bubble">⚠️ Atención: Carlos Herrera en hab. 215 tiene tarea vencida. Prioridad alta.</div>
+                  </div>
+                </div>
+                <div class="chat-msg">
+                  <div class="chat-av" style="background:var(--green);">MG</div>
+                  <div class="chat-bubble-wrap">
+                    <div class="chat-meta"><span class="chat-name">Mateo González</span><span class="chat-time">10:44</span></div>
+                    <div class="chat-bubble">En camino. ¿Qué tarea es? Sería bueno linkearlo directo desde acá 👀</div>
+                  </div>
+                </div>
+                <div class="chat-msg">
+                  <div class="chat-av" style="background:var(--purple);">CR</div>
+                  <div class="chat-bubble-wrap">
+                    <div class="chat-meta"><span class="chat-name">Carlos Ramírez</span><span class="chat-time">10:45</span></div>
+                    <div class="chat-bubble">Tarea #593 — Control de presión arterial. La puedes ver en el Planner.</div>
+                    <div class="chat-task-ref"><span class="ctr-id">#593</span><span class="ctr-title">Control de presión arterial</span><span class="ctr-status" style="background:#FEE2E2;color:var(--red);">Vencida</span></div>
+                  </div>
+                </div>
+                <div class="chat-msg chat-msg-me">
+                  <div class="chat-bubble-wrap" style="align-items:flex-end;">
+                    <div class="chat-meta" style="justify-content:flex-end;"><span class="chat-time">11:12</span><span class="chat-name">Tú (Admin)</span></div>
+                    <div class="chat-bubble chat-bubble-me">Gracias Carlos. Ya actualicé el estado. Mateo, confirma cuando termines 🙌</div>
+                  </div>
+                  <div class="chat-av" style="background:var(--navy);">AC</div>
+                </div>
+              </div>
+              <!-- Input -->
+              <div class="chat-input-wrap">
+                <div class="chat-input-box">
+                  <input class="chat-input" id="chatInput" type="text" placeholder="Escribe un mensaje en #general-operaciones..." />
+                  <div class="chat-input-actions">
+                    <button class="chat-icon-btn" title="Adjuntar tarea">📋</button>
+                    <button class="chat-icon-btn" title="Archivo">📎</button>
+                    <button class="chat-send" onclick="sendChatMsg()">
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M14 2L2 8l5 1.5L14 2zM7 9.5L8.5 14 14 2" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div><!-- /panel-chat -->
+
+          </div><!-- app-content -->
+        </div><!-- app-body -->
+      </div><!-- widget-wrap -->
+    </div><!-- mockup scene -->
+
+  </div><!-- hero-inner -->
+
+  <div class="scroll-hint">
+    <span class="sh-lbl">Scroll</span>
+    <div class="sh-m"><div class="sh-w"></div></div>
+  </div>
+</section>
+
+<!-- CLIENTS -->
+<div class="clients">
+  <span class="cl-lbl">Empresas que confían</span>
+  <div class="cl-div"></div>
+  <div class="cl-scroll">
+    <div class="cl-track">
+      <span class="cl-name">Clínica Santa María</span>
+      <span class="cl-name">Hotel Magnolia</span>
+      <span class="cl-name">Mutual Asesorías</span>
+      <span class="cl-name">Mutual de Seguridad</span>
+      <span class="cl-name">Clínica Dávila</span>
+      <span class="cl-name">Red Salud</span>
+      <span class="cl-name">Clínica Santa María</span>
+      <span class="cl-name">Hotel Magnolia</span>
+      <span class="cl-name">Mutual Asesorías</span>
+      <span class="cl-name">Mutual de Seguridad</span>
+      <span class="cl-name">Clínica Dávila</span>
+      <span class="cl-name">Red Salud</span>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ── TAB SWITCHING ── */
+function switchTab(btn) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  const panel = document.getElementById('panel-' + btn.dataset.tab);
+  if (panel) panel.classList.add('active');
+  // sync sidebar
+  document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
+  const sbItem = document.querySelector(`.sb-item[onclick*="${btn.dataset.tab}"]`);
+  if (sbItem) sbItem.classList.add('active');
+}
+
+function switchSb(el, tab) {
+  document.querySelectorAll('.sb-item').forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  const tabBtn = document.querySelector(`.tab-btn[data-tab="${tab}"]`);
+  if (tabBtn) switchTab(tabBtn);
+}
+
+/* ── 3D TILT ── */
+const card = document.getElementById('mainCard');
+if (card) {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left - r.width/2) / (r.width/2);
+    const y = (e.clientY - r.top - r.height/2) / (r.height/2);
+    card.style.transition = 'transform .08s ease';
+    card.style.transform = `perspective(1100px) rotateY(${x*5}deg) rotateX(${-y*3}deg) translateZ(4px)`;
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transition = 'transform .5s cubic-bezier(.23,1,.32,1)';
+    card.style.transform = 'perspective(1100px) rotateY(-4deg) rotateX(2deg)';
+  });
+}
+
+/* ── PARALLAX ── */
+window.addEventListener('scroll', () => {
+  const sy = window.scrollY;
+  const l = document.getElementById('heroLeft');
+  const s = document.getElementById('mockupScene');
+  if (l) l.style.transform = `translateY(${sy * .07}px)`;
+  if (s) s.style.transform = `translateY(${sy * .035}px)`;
+});
+
+/* ── PARTICLES ── */
+(function(){
+  const c = document.getElementById('pcanvas');
+  const ctx = c.getContext('2d');
+  let W, H, pts = [];
+  function resize(){ W = c.width = c.offsetWidth; H = c.height = c.offsetHeight; }
+  resize();
+  window.addEventListener('resize', () => { resize(); init(); });
+  class P {
+    constructor(){ this.reset(); this.y = Math.random() * H; }
+    reset(){
+      this.x = Math.random()*W; this.y = H+10;
+      this.vx = (Math.random()-.5)*.22; this.vy = -(Math.random()*.32+.07);
+      this.sz = Math.random()*1.6+.5; this.a = 0;
+      this.ma = Math.random()*.15+.04;
+      this.life = 0; this.ml = Math.random()*320+160;
+    }
+    upd(){
+      this.x += this.vx; this.y += this.vy; this.life++;
+      const t = this.life/this.ml;
+      if(t<.15) this.a=(t/.15)*this.ma;
+      else if(t>.7) this.a=((1-t)/.3)*this.ma;
+      else this.a = this.ma;
+      if(this.life >= this.ml) this.reset();
+    }
+    drw(){
+      ctx.save(); ctx.globalAlpha = this.a; ctx.fillStyle = '#00A9B3';
+      ctx.beginPath(); ctx.arc(this.x,this.y,this.sz,0,Math.PI*2); ctx.fill();
+      ctx.restore();
+    }
+  }
+  function init(){ pts=[]; for(let i=0;i<45;i++) pts.push(new P()); }
+  function loop(){ ctx.clearRect(0,0,W,H); pts.forEach(p=>{p.upd();p.drw();}); requestAnimationFrame(loop); }
+  init(); loop();
+})();
+
+/* ── COUNTERS ── */
+document.querySelectorAll('[data-target]').forEach(el => {
+  const target = +el.dataset.target;
+  const em = el.querySelector('em');
+  const suffix = em ? em.outerHTML : '';
+  let n = 0;
+  const step = Math.max(1, Math.ceil(target/40));
+  const iv = setInterval(() => {
+    n = Math.min(n + step, target);
+    el.innerHTML = `+${n}${suffix}`;
+    if(n >= target) clearInterval(iv);
+  }, 28);
+});
+
+/* ── BED GRID GENERATION ── */
+(function buildBeds(){
+  const piso3 = [
+    'ocupada','ocupada','libre','ocupada','limpieza','ocupada','ocupada','libre','libre','ocupada',
+    'ocupada','reservada','ocupada','libre','ocupada','limpieza','ocupada','ocupada','libre','ocupada',
+    'libre','ocupada','ocupada','ocupada','reservada','ocupada','libre','ocupada','ocupada','libre',
+  ];
+  const uci = [
+    'ocupada','ocupada','ocupada','libre','ocupada','ocupada','limpieza','ocupada',
+    'ocupada','libre','ocupada','ocupada','libre','ocupada','reservada','ocupada',
+  ];
+  const names3 = ['301','302','303','304','305','306','307','308','309','310','311','312','313','314','315','316','317','318','319','320','321','322','323','324','325','326','327','328','329','330'];
+  const namesU = ['U01','U02','U03','U04','U05','U06','U07','U08','U09','U10','U11','U12','U13','U14','U15','U16'];
+  const icons = {libre:'🛏',ocupada:'🧑',limpieza:'🧹',reservada:'📋'};
+  function render(containerId, beds, names){
+    const c = document.getElementById(containerId);
+    if(!c) return;
+    beds.forEach((st,i)=>{
+      const el = document.createElement('div');
+      el.className = `cama-cell cama-${st}`;
+      el.title = `Cama ${names[i]} — ${st.charAt(0).toUpperCase()+st.slice(1)}`;
+      el.innerHTML = `<span class="cama-icon">${icons[st]}</span><span>${names[i]}</span>`;
+      el.addEventListener('click', ()=>{
+        const next = {libre:'reservada',reservada:'libre',ocupada:'ocupada',limpieza:'libre'}[st];
+        beds[i] = next; el.className = `cama-cell cama-${next}`; el.title=`Cama ${names[i]} — ${next}`;
+        el.querySelector('.cama-icon').textContent = icons[next];
+      });
+      c.appendChild(el);
+    });
+  }
+  render('camasGrid', piso3, names3);
+  render('ucGrid', uci, namesU);
+})();
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => chip.classList.toggle('on'));
+});
+
+/* ── CREAR: pill toggle ── */
+document.querySelectorAll('#cf-prio .cf-pill').forEach(p => {
+  p.addEventListener('click', () => {
+    document.querySelectorAll('#cf-prio .cf-pill').forEach(x => x.classList.remove('active'));
+    p.classList.add('active');
+  });
+});
+document.querySelectorAll('#cf-tags .cf-tag-item').forEach(t => {
+  t.addEventListener('click', () => t.classList.toggle('active'));
+});
+
+function crearTarea() {
+  const titulo = document.getElementById('cf-titulo').value.trim();
+  const resp = document.getElementById('cf-resp').value;
+  if (!titulo || !resp) {
+    document.getElementById('cf-titulo').focus();
+    document.getElementById('cf-titulo').style.borderColor = 'var(--red)';
+    setTimeout(() => document.getElementById('cf-titulo').style.borderColor = '', 1500);
+    return;
+  }
+  document.getElementById('cf-success-name').textContent = resp;
+  document.getElementById('cf-success').classList.add('show');
+  document.getElementById('cf-titulo').value = '';
+}
+function resetForm() {
+  document.getElementById('cf-success').classList.remove('show');
+  document.getElementById('cf-resp').value = '';
+  document.getElementById('cf-tipo').value = '';
+  document.getElementById('cf-desc').value = '';
+}
+
+/* ── MONITOR: live feed ── */
+const liveEvents = [
+  {type:'done', ico:'✓', title:'Tarea completada', sub:'Housekeeping hab. 412 · Laura F.'},
+  {type:'warn', ico:'⚠', title:'Sin confirmar hace +30 min', sub:'Mantenimiento equipo #B-07 · Mateo G.'},
+  {type:'info', ico:'→', title:'Tarea reasignada', sub:'Control PA #601 → Isabella R.'},
+  {type:'done', ico:'✓', title:'Formulario enviado', sub:'Alta médica · Roberto S. · Cirugía'},
+  {type:'warn', ico:'⚠', title:'Alerta de paciente', sub:'Hab. 215 · Signos vitales inusuales'},
+  {type:'info', ico:'ℹ', title:'Nueva ronda iniciada', sub:'Piso 3 · 6 pacientes en seguimiento'},
+  {type:'done', ico:'✓', title:'Inventario actualizado', sub:'Bodega Central · 24 ítems registrados'},
+];
+let liveIdx = 0, liveActivas = 47, liveAlertas = 8, liveComp = 23;
+
+setInterval(() => {
+  const panel = document.getElementById('panel-monitor');
+  if (!panel || !panel.classList.contains('active')) return;
+  const ev = liveEvents[liveIdx % liveEvents.length];
+  liveIdx++;
+  const feed = document.getElementById('monFeed');
+  const el = document.createElement('div');
+  el.className = `mon-event mon-ev-${ev.type === 'done' ? 'done' : ev.type === 'warn' ? 'warn' : 'info'} new`;
+  el.innerHTML = `<span class="mon-ev-ico">${ev.ico}</span><div class="mon-ev-body"><div class="mon-ev-title">${ev.title}</div><div class="mon-ev-sub">${ev.sub}</div></div><span class="mon-ev-time">ahora</span>`;
+  feed.insertBefore(el, feed.firstChild);
+  if (feed.children.length > 8) feed.removeChild(feed.lastChild);
+  // Update previous times
+  feed.querySelectorAll('.mon-ev-time').forEach((t, i) => {
+    if (i > 0) t.textContent = `hace ${i * 2} min`;
+  });
+  // Update metrics
+  if (ev.type === 'done') { liveComp++; liveActivas = Math.max(0, liveActivas - 1); }
+  if (ev.type === 'warn') { liveAlertas++; }
+  if (ev.type === 'info') { liveActivas++; }
+  document.getElementById('mk-activas').textContent = liveActivas;
+  document.getElementById('mk-alertas').textContent = liveAlertas;
+  document.getElementById('mk-comp').textContent = liveComp;
+  document.getElementById('mb-activas').style.width = Math.min(liveActivas, 100) + '%';
+  document.getElementById('mb-alertas').style.width = Math.min(liveAlertas * 3, 100) + '%';
+  document.getElementById('mb-comp').style.width = Math.min(liveComp, 100) + '%';
+}, 3200);
+
+/* ── CHAT: send message ── */
+const chatAvatars = [{bg:'#7C3AED',init:'TU'}];
+function sendChatMsg() {
+  const input = document.getElementById('chatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  const msgs = document.getElementById('chatMessages');
+  const el = document.createElement('div');
+  el.className = 'chat-msg chat-msg-me chat-msg-new';
+  el.innerHTML = `
+    <div class="chat-bubble-wrap" style="align-items:flex-end;">
+      <div class="chat-meta" style="justify-content:flex-end;"><span class="chat-time">${new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})}</span><span class="chat-name">Tú (Admin)</span></div>
+      <div class="chat-bubble chat-bubble-me">${text}</div>
+    </div>
+    <div class="chat-av" style="background:var(--navy);">AC</div>`;
+  msgs.appendChild(el);
+  msgs.scrollTop = msgs.scrollHeight;
+  input.value = '';
+  // Simulated reply after 1.5s
+  const replies = [
+    {name:'Carlos Ramírez', bg:'var(--purple)', init:'CR', txt:'Entendido, lo gestiono ahora mismo 👍'},
+    {name:'Laura Fernández', bg:'var(--orange)', init:'LF', txt:'Recibido. Ya actualicé la tarea en el sistema ✓'},
+    {name:'Mateo González', bg:'var(--green)', init:'MG', txt:'Ok, en 10 minutos confirmo desde terreno.'},
+  ];
+  setTimeout(() => {
+    const r = replies[Math.floor(Math.random() * replies.length)];
+    const re = document.createElement('div');
+    re.className = 'chat-msg chat-msg-new';
+    re.innerHTML = `
+      <div class="chat-av" style="background:${r.bg};">${r.init}</div>
+      <div class="chat-bubble-wrap">
+        <div class="chat-meta"><span class="chat-name">${r.name}</span><span class="chat-time">${new Date().toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'})}</span></div>
+        <div class="chat-bubble">${r.txt}</div>
+      </div>`;
+    msgs.appendChild(re);
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 1500);
+}
+document.getElementById('chatInput')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') sendChatMsg();
+});
+</script>
+</body>
+</html>
